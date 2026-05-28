@@ -36,37 +36,7 @@ jobs:
       - name: Build project (optional)
         run: ./gradlew clean build
 
-      # Run jtest ai agent autofix flow - Linux
-      - name: Run jtest ai agent autofix flow (Linux)
-        id: run-jtest-ai-agent-autofix-linux
-        if: runner.os == 'Linux'
-        env:
-          WORKFLOWS_DIR: ${{ github.workspace }}/.github/workflows
-          GH_TOKEN: ${{ secrets.AGENT_PAT }}
-          AGENT_GH_PAT: ${{ secrets.AGENT_GH_PAT }}
-        run: |
-          # Set-up autofix branch
-          BRANCH_NAME="jtest-autofix-$(date +'%Y-%m-%d_%H-%M-%S')"
-          git checkout -b "$BRANCH_NAME"
-          
-          # Run jtest AI agent (emulated with echo command here)
-          export JTEST_SKILLS_CONFIG="${{ github.workspace }}/jtest-skills.config"
-          echo "ANALYZED_PROJECT_PATH=${{ github.workspace }}" >> "$JTEST_SKILLS_CONFIG"
-          copilot -p "Use jtest-static-analysis to analyse and fix violations in the project. Use jtest-unit-testing to increase coverage. Commit each change separately. Create a summary and enlist in point what was changed in the project."  --allow-all-tools  --add-dir ${{ github.workspace }}
-          
-          # Only push and comment if there are new commits
-          if [ "$(git rev-parse HEAD)" != "$GITHUB_SHA" ]; then
-            git push -u origin HEAD
-            ORIGINAL_BRANCH="${{ github.event.pull_request.head.ref }}"
-            BRANCH_URL="${{ github.server_url }}/${{ github.repository }}/tree/$BRANCH_NAME"
-            export GH_TOKEN="$AGENT_GH_PAT"
-            gh pr create --head "$BRANCH_NAME" --base "$ORIGINAL_BRANCH" --title "jtest-ai-agent: $BRANCH_NAME" --body "Automated jtest AI agent changes"
-            PR_URL="${{ github.server_url }}/${{ github.repository }}/pull"
-            sleep 2
-            PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --base "$ORIGINAL_BRANCH" --state open --limit 1 | head -n 1 | cut -d' ' -f1)
-            gh pr comment ${{ github.event.pull_request.number }} --body "jtest AI agent branch: $BRANCH_URL | Pull request: $PR_URL/$PR_NUMBER"
-          fi
-
+      
       # Run jtest ai agent autofix flow - Windows
       - name: Run jtest ai agent autofix flow (Windows)
         id: run-jtest-ai-agent-autofix-win
