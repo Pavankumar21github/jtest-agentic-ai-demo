@@ -53,7 +53,7 @@ jobs:
           $SkillsConfigPath = "${{ github.workspace }}\jtest-skills.config"
           $env:JTEST_SKILLS_CONFIG = $SkillsConfigPath
           Add-Content -Path $SkillsConfigPath -Value "ANALYZED_PROJECT_PATH=${{ github.workspace }}"
-          copilot -p "Use jtest-static-analysis to analyse and fix violations in the project. Use jtest-unit-testing to increase coverage. Commit each change separately. Create a summary and enlist in point what was changed in the project."  --allow-all-tools  --allow-mcp jtestmcp --add-dir ${{ github.workspace }} 
+          copilot -p "Use jtest-static-analysis to analyse and fix violations in the project. Use jtest-unit-testing to increase coverage. Commit each change separately. Create a summary and enlist in point what was changed in the project."  --allow-all-tools  --allow-mcp --add-dir ${{ github.workspace }} 
           
           # Only push and comment if there are new commits
           if ((git rev-parse HEAD) -ne $env:GITHUB_SHA) {
