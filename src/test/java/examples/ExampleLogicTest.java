@@ -25,4 +25,19 @@ class ExampleLogicTest
         String content = Files.readString(file);
         assertTrue(content.contains("Hello"));
     }
+
+    @Test
+    void appendString_appendsMultipleLines() throws IOException {
+        ExampleLogic logic = new ExampleLogic();
+        Path file = tempDir.resolve("multi.txt");
+
+        logic.appendMessageToFile(file.toFile(), "First");
+        logic.appendMessageToFile(file.toFile(), "Second");
+
+        String content = Files.readString(file);
+        assertTrue(content.contains("First"));
+        assertTrue(content.contains("Second"));
+        long lines = Files.readAllLines(file).size();
+        assertTrue(lines >= 2);
+    }
 }
